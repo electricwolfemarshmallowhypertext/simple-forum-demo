@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Forum</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Simple Forum</h1>
+
+    <div class="form-box">
+      <input id="username" type="text" placeholder="Your name" />
+      <input id="title" type="text" placeholder="Post title" />
+      <textarea id="message" placeholder="Write your message"></textarea>
+      <button onclick="addPost()">Post</button>
+    </div>
+
+    <h2>Posts</h2>
+    <div id="posts"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
