@@ -2,6 +2,8 @@
 
 This is a pure HTML, CSS, and JavaScript forum frontend demo. It has no build step, no framework, and no backend dependency.
 
+Live demo: https://daosist1.github.io/simple-forum-demo/
+
 ## Features
 
 - Dynamic forum feed with sections, tags, search, and sorting
