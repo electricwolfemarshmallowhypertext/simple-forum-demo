@@ -1,26 +1,289 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Forum</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1>Simple Forum</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A dynamic forum frontend with topics, reactions, search, filters, motion, and optional sound."
+    />
+    <title>simple-forum-demo | Neon Forum</title>
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://i.pravatar.cc" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <canvas id="signalCanvas" aria-hidden="true"></canvas>
+    <div class="ambient-grid" aria-hidden="true"></div>
 
-    <div class="form-box">
-      <input id="username" type="text" placeholder="Your name" />
-      <input id="title" type="text" placeholder="Post title" />
-      <textarea id="message" placeholder="Write your message"></textarea>
-      <button onclick="addPost()">Post</button>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Neon Forum">
+          <span class="brand-mark">NF</span>
+          <span>
+            <strong>Neon Forum</strong>
+            <small>simple-forum-demo</small>
+          </span>
+        </a>
+
+        <label class="search" for="searchInput">
+          <span aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+            </svg>
+          </span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search topics, tags, authors"
+            data-i18n-placeholder="searchPlaceholder"
+          />
+        </label>
+
+        <nav class="top-actions" data-i18n-aria="quickActions" aria-label="Quick actions">
+          <button
+            class="icon-button"
+            id="soundToggle"
+            type="button"
+            aria-label="Disable sounds"
+            title="Sounds"
+            data-i18n-title="soundsTitle"
+          >
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M11 5 6 9H2v6h4l5 4V5Z" />
+              <path d="M16 9.5a4 4 0 0 1 0 5" />
+              <path d="M19 7a8 8 0 0 1 0 10" />
+            </svg>
+          </button>
+          <button
+            class="icon-button"
+            id="themeButton"
+            type="button"
+            aria-label="Change theme"
+            title="Theme"
+            data-i18n-aria="changeTheme"
+            data-i18n-title="themeTitle"
+          >
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+          </button>
+          <button
+            class="language-button"
+            id="languageToggle"
+            type="button"
+            aria-label="Switch to Thai"
+            title="Language"
+            data-i18n-title="languageTitle"
+          >
+            TH
+          </button>
+          <button class="primary-button" id="openComposer" type="button">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span data-i18n="newThread">New thread</span>
+          </button>
+        </nav>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar" data-i18n-aria="forumSections" aria-label="Forum sections">
+          <section class="profile-panel">
+            <img
+              src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=480&q=80"
+              alt="Team discussing a project"
+              data-i18n-alt="teamAlt"
+            />
+            <div>
+              <p data-i18n="onlineToday">Online today</p>
+              <strong id="onlineCount">128</strong>
+            </div>
+          </section>
+
+          <section class="nav-panel">
+            <div class="panel-title" data-i18n="sectionsTitle">Sections</div>
+            <div class="channel-list" id="channelList"></div>
+          </section>
+
+          <section class="nav-panel pulse-panel">
+            <div class="panel-title" data-i18n="pulseTitle">Pulse</div>
+            <div class="pulse-row">
+              <span data-i18n="newReplies">New replies</span>
+              <strong id="replyPulse">47</strong>
+            </div>
+            <div class="pulse-row">
+              <span data-i18n="hotThreads">Hot threads</span>
+              <strong id="hotPulse">12</strong>
+            </div>
+            <div class="activity-bars" aria-hidden="true">
+              <span style="--h: 44%"></span>
+              <span style="--h: 72%"></span>
+              <span style="--h: 58%"></span>
+              <span style="--h: 89%"></span>
+              <span style="--h: 66%"></span>
+              <span style="--h: 78%"></span>
+              <span style="--h: 52%"></span>
+            </div>
+          </section>
+        </aside>
+
+        <section class="feed-column" data-i18n-aria="forumFeed" aria-label="Forum feed">
+          <div class="feed-header">
+            <div>
+              <p class="eyebrow" data-i18n="liveFeed">Live feed</p>
+              <h1 data-i18n="heroTitle">Threads that are moving the forum right now</h1>
+            </div>
+            <div class="segmented" role="group" data-i18n-aria="sorting" aria-label="Sorting">
+              <button class="segment active" data-sort="hot" type="button" data-i18n="sortHot">Hot</button>
+              <button class="segment" data-sort="new" type="button" data-i18n="sortNew">New</button>
+              <button class="segment" data-sort="top" type="button" data-i18n="sortTop">Top</button>
+            </div>
+          </div>
+
+          <div class="tag-strip" id="tagStrip" data-i18n-aria="tags" aria-label="Tags"></div>
+
+          <section class="composer-inline" data-i18n-aria="quickCreate" aria-label="Quickly create a thread">
+            <button
+              class="composer-avatar"
+              type="button"
+              id="quickComposer"
+              data-i18n-aria="createThread"
+              aria-label="Create a thread"
+            >
+              <img src="https://i.pravatar.cc/120?img=32" alt="Your avatar" data-i18n-alt="yourAvatar" />
+            </button>
+            <button class="composer-prompt" type="button" id="quickComposerText" data-i18n="composerPrompt">
+              What should we discuss today?
+            </button>
+          </section>
+
+          <div class="thread-list" id="threadList"></div>
+        </section>
+
+        <aside class="right-rail" data-i18n-aria="forumSummary" aria-label="Forum summary">
+          <section class="spotlight-card">
+            <div class="spotlight-media">
+              <img
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=720&q=80"
+                alt="Laptop workspace with forum discussion"
+                data-i18n-alt="spotlightAlt"
+              />
+              <span class="live-dot">live</span>
+            </div>
+            <div class="spotlight-copy">
+              <p class="eyebrow" data-i18n="topicOfDay">Topic of the day</p>
+              <h2 data-i18n="spotlightTitle">How do you make a forum feel alive without overload?</h2>
+              <p data-i18n="spotlightCopy">
+                Members are voting for quick reactions, smart tags, and tasteful micro-interactions.
+              </p>
+            </div>
+          </section>
+
+          <section class="side-card">
+            <div class="panel-title" data-i18n="trendsTitle">Trends</div>
+            <div class="trend-list" id="trendList"></div>
+          </section>
+
+          <section class="side-card">
+            <div class="panel-title" data-i18n="membersTitle">Members</div>
+            <div class="member-stack" id="memberStack"></div>
+          </section>
+        </aside>
+      </main>
     </div>
 
-    <h2>Posts</h2>
-    <div id="posts"></div>
-  </div>
+    <div class="modal-layer" id="threadModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <article class="thread-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button
+          class="icon-button close-button"
+          type="button"
+          data-close-modal
+          data-i18n-aria="closeDiscussion"
+          aria-label="Close discussion"
+        >
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <div id="modalContent"></div>
+      </article>
+    </div>
 
-  <script src="script.js"></script>
-</body>
+    <div class="modal-layer" id="composerModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-composer></div>
+      <form class="composer-modal" id="composerForm" data-i18n-aria="createNewThread" aria-label="Create a new thread">
+        <button
+          class="icon-button close-button"
+          type="button"
+          data-close-composer
+          data-i18n-aria="closeForm"
+          aria-label="Close form"
+        >
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <p class="eyebrow" data-i18n="newThread">New thread</p>
+        <h2 data-i18n="composerTitle">Start a discussion</h2>
+        <label>
+          <span data-i18n="titleLabel">Title</span>
+          <input
+            name="title"
+            type="text"
+            maxlength="88"
+            placeholder="Example: How can we make member profiles more alive?"
+            data-i18n-placeholder="titlePlaceholder"
+            required
+          />
+        </label>
+        <label>
+          <span data-i18n="descriptionLabel">Short description</span>
+          <textarea
+            name="excerpt"
+            rows="4"
+            maxlength="240"
+            placeholder="Frame the question or idea you want people to discuss"
+            data-i18n-placeholder="descriptionPlaceholder"
+            required
+          ></textarea>
+        </label>
+        <div class="form-grid">
+          <label>
+            <span data-i18n="sectionLabel">Section</span>
+            <select name="channel" required>
+              <option value="design">Design</option>
+              <option value="code">Code</option>
+              <option value="ideas">Ideas</option>
+              <option value="games">Games</option>
+              <option value="support">Support</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="tagLabel">Tag</span>
+            <select name="tag" required>
+              <option value="ux">ux</option>
+              <option value="frontend">frontend</option>
+              <option value="motion">motion</option>
+              <option value="audio">audio</option>
+              <option value="release">release</option>
+            </select>
+          </label>
+        </div>
+        <button class="primary-button submit-button" type="submit">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path d="M22 2 11 13" />
+            <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+          </svg>
+          <span data-i18n="publish">Publish</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./script.js"></script>
+  </body>
 </html>
