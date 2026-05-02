@@ -33,7 +33,7 @@ Dear Professor,
 
 I know this project has a suspiciously large number of lines for a small forum demo. That is partly the point: the frontend is doing the visual design, responsive layout, animation, sound, demo data, language switching, modal behavior, filtering, sorting, reactions, and local interaction logic without any external framework.
 
-Reading every line manually may be less fun than simply opening the page and clicking around. The code is intentionally split into `index.html`, `style.css`, and `script.js`, so the structure, presentation, and behavior are at least polite enough to stay in their own rooms.
+Reading every line manually may be less fun than simply opening the page and clicking around. The code is intentionally split into `index.html`, `style.css`, and `app.js`, so the structure, presentation, and behavior are at least polite enough to stay in their own rooms.
 
 Respectfully,  
 the student who may have made the professor scroll a bit too much
